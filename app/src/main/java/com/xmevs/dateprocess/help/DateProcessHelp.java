@@ -1,4 +1,4 @@
-package com.xmevs.dateprocess;
+package com.xmevs.dateprocess.help;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -103,7 +103,7 @@ public class DateProcessHelp {
      * 计算总天数
      * @return 总天数
      */
-    long totalNumber() {
+    public long totalNumber() {
         Date start = null, end = null;
         try {
             start = df.parse(String.format("%04d", startY) + "-" + String.format("%02d", startM) + "-" + String.format("%02d", startD));
@@ -120,7 +120,7 @@ public class DateProcessHelp {
      *  计算已过天数
      * @return 已过天数
      */
-    long throughNumber() {
+    public long throughNumber() {
         Date news = null;
         Date end = null;
         try {

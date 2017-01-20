@@ -1,4 +1,4 @@
-package com.xmevs.dateprocess;
+package com.xmevs.dateprocess.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -64,38 +64,60 @@ public class RotatingRect extends View {
 
         float width41 = width/12;
         float width43 = width - width / 12;
+        RectF rect;
 
-        String color = setColor().toString();
-        paint.setColor(Color.parseColor(color.trim()));
-        RectF rect = new RectF(width41, width41, width43, width43);
-        canvas.drawArc(rect, 180f, process, true, paint);
-
+        //绘制灰色条
         paint.setColor(Color.rgb(217, 217, 255));
         rect = new RectF(width41, width41,width43, width43);
-        canvas.drawArc(rect, process+180f, 180f-process, true, paint);
+        canvas.drawArc(rect, 180f, 360f, true, paint);
 
+        //绘制进度条
+        String color = setColor().toString();
+        paint.setColor(Color.parseColor(color.trim()));
+        rect = new RectF(width41, width41, width43, width43);
+        canvas.drawArc(rect, 180f, process, true, paint);
+
+        //绘制覆盖上的白底
         float startwith = width/5;
         float endwith = width - startwith;
         paint.setColor(Color.rgb(250, 250, 250));
         rect = new RectF(startwith, startwith, endwith, endwith);
         canvas.drawArc(rect, 180f,  180f, true, paint);
 
+        //底下白底 覆盖多余的灰色框
+        paint.setColor(Color.rgb(250, 250, 250));
+        rect = new RectF(width41, width41,width43, width43);
+        canvas.drawArc(rect, 0f,  180f, true, paint);
+
         paint.setColor(Color.rgb(78, 80, 79));
-        paint.setTextSize(48 * scale *0.5f);
-        paint.setTextAlign(Paint.Align.CENTER);
-        String testString = (String.format("%.2f", nowValue))+"%";
+
+        //百分数值设置
+        paint.setTextAlign(Paint.Align.CENTER);paint.setTextSize(48 * scale *0.5f);
+        String testString;
+        if(nowValue>100) {
+            testString = "已结束";
+        } else {
+            testString = (String.format("%.2f", nowValue))+"%";
+        }
         canvas.drawText(testString, rect.centerX(), rect.centerY()/5*4, paint);
 
-        long throughWeek = mThroughNumber/7;
-        long throughDay = mThroughNumber%7;
-        paint.setTextSize(24 * scale *0.5f);
+        //剩余天数设置
+        paint.setTextSize(24 * scale * 0.5f);
         paint.setColor(Color.rgb(115, 115, 115));
-        if(throughDay==0) {
-            testString = mThroughNumber + "天(" + throughWeek + "周整)";
-        } else if(throughWeek<1) {
-            testString = mThroughNumber + "天(" + throughDay + "天)";
+        if(mThroughNumber > 0) {
+            long throughWeek = mThroughNumber / 7;
+            long throughDay = mThroughNumber % 7;
+            if (throughDay == 0) {
+                testString = mThroughNumber + "天(" + throughWeek + "周整)";
+            } else if (throughWeek < 1) {
+                testString = mThroughNumber + "天(" + throughDay + "天)";
+            } else {
+                testString = mThroughNumber + "天(" + throughWeek + "周又" + throughDay + "天)";
+            }
+        } else if(mThroughNumber ==0){
+            testString = "今日完成进程";
         } else {
-            testString = mThroughNumber + "天(" + throughWeek + "周又" +throughDay + "天)";
+            testString = "进程已结束";
         }
         canvas.drawText(testString, rect.centerX(), rect.centerY(), paint);
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
