@@ -10,8 +10,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MyHelper extends SQLiteOpenHelper {
 
-    public static final String ID = "id";
+    public static final String ID = "_id";
     public static final String TIMESLOT = "timeslot";
+    public static final String SLOTNAME = "slotname";
 
     public MyHelper(Context context) {
         super(context, "timeslot.db", null, 5);
@@ -21,7 +22,8 @@ public class MyHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE timeslot(" +
                 "  _id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                TIMESLOT + " VARCHAR" +
+                TIMESLOT + " VARCHAR," +
+                SLOTNAME + " VARCHAR" +
                 ")");
     }
 

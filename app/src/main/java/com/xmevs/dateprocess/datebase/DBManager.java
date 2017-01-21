@@ -19,8 +19,9 @@ public class DBManager {
     private MyHelper helper;
     private SQLiteDatabase db;
 
-    public static final String ID = "_id";
-    public static final String TIMESLOT = "timeslot";
+//    public static final String ID = "_id";
+//    public static final String TIMESLOT = "timeslot";
+//    public static final String SLOTNAME = "slotname";
 
     public DBManager(Context context) {
         helper = new MyHelper(context);
@@ -35,7 +36,8 @@ public class DBManager {
         db.beginTransaction();
         try {
             for (Info info : infos) {
-                db.execSQL("INSERT INTO timeslot VALUES(null, ?)", new Object[]{info.getTimeslot()});
+                db.execSQL("INSERT INTO timeslot VALUES(null, ?, ?)",
+                        new Object[]{info.getTimeslot(), info.getSlotname()});
             }
             db.setTransactionSuccessful();
         } finally {
@@ -50,9 +52,10 @@ public class DBManager {
     public void add(Info info) {
         db.beginTransaction();
         try {
-                db.execSQL("INSERT INTO timeslot VALUES(null, ?)",
+                db.execSQL("INSERT INTO timeslot VALUES(null, ?, ?)",
                                             new Object[]{
                                                     info.getTimeslot(),
+                                                    info.getSlotname(),
                                             });
             db.setTransactionSuccessful();
         } finally {
@@ -64,10 +67,11 @@ public class DBManager {
         String sql =                 "UPDATE" +
                 "  `timeslot`" +
                 "SET" +
-                "  `" + TIMESLOT + "` = '" + newInfo.getTimeslot() + "'" +
+                "  `" + MyHelper.TIMESLOT + "` = '" + newInfo.getTimeslot() + "', " +
+                "  `" + MyHelper.SLOTNAME + "` = '" + newInfo.getSlotname() + "' " +
                 "WHERE" +
                 " _id = " + id;
-        Log.i("sql", sql);
+//        Log.i("sql", sql);
         db.execSQL(sql);
     }
 
@@ -81,12 +85,14 @@ public class DBManager {
 
     public List<Info> querys() {
         String timeslot;
+        String slotname;
         ArrayList<Info> infos = new ArrayList<Info>();
         Cursor c = queryTheCursors();
         while (c.moveToNext()) {
-            int id = c.getInt(c.getColumnIndex(ID));
-            timeslot = c.getString(c.getColumnIndex(TIMESLOT));
-            Info info = new Info(id, timeslot);
+            int id = c.getInt(c.getColumnIndex(MyHelper.ID));
+            timeslot = c.getString(c.getColumnIndex(MyHelper.TIMESLOT));
+            slotname = c.getString(c.getColumnIndex(MyHelper.SLOTNAME));
+            Info info = new Info(id, timeslot, slotname);
             infos.add(info);
         }
         c.close();
@@ -100,22 +106,24 @@ public class DBManager {
 
     public Info query(int whereId) {
         String timeslot;
+        String slotname;
         Info info;
                 Cursor c = queryTheCursor(whereId);
         if(c.moveToFirst()) {
-            int id = c.getInt(c.getColumnIndex(ID));
-            timeslot = c.getString(c.getColumnIndex(TIMESLOT));
-            info = new Info(id, timeslot);
-            c.close();
-            return info;
+            int id = c.getInt(c.getColumnIndex(MyHelper.ID));
+            timeslot = c.getString(c.getColumnIndex(MyHelper.TIMESLOT));
+            slotname = c.getString(c.getColumnIndex(MyHelper.SLOTNAME));
+            info = new Info(id, timeslot, slotname);
+        } else {
+            info = new Info(-1, "-1", "NULL");
         }
         c.close();
-        info = new Info(-1, "-1");
         return info;
     }
 
     private Cursor queryTheCursor(int whereId) {
-        Cursor c = db.rawQuery("SELECT * FROM `timeslot` WHERE `" + ID + "`=?", new String[]{whereId+""});
+        Cursor c = db.rawQuery("SELECT * FROM `timeslot` WHERE `" + MyHelper.ID + "`=?", new String[]{whereId+""});
+        Log.i("queryTheCursor", "Cursor c = " + c.toString());
         return c;
     }
 

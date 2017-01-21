@@ -120,7 +120,7 @@ public class RotatingRect extends View {
             testString = "进程已结束";
         }
         canvas.drawText(testString, rect.centerX(), rect.centerY(), paint);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
 //        canvas.restore();
 //        invalidate();//使view无效，就被被重新调用draw()

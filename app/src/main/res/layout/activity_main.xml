@@ -12,6 +12,15 @@
     android:gravity="center"
     tools:context="com.xmevs.dateprocess.activity.MainActivity">
 
+    <TextView
+        android:id="@+id/tvSlotname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="45dp"
+        android:paddingBottom="15dp"
+        android:gravity="center_horizontal"
+        android:text="距离放假"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

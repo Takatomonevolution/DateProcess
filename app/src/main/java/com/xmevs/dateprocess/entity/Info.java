@@ -8,17 +8,23 @@ public class Info {
 
     int id;
     String timeslot;
+    String slotname;
+
+    public Info(int id, String timeslot, String slotname) {
+        this.id = id;
+        this.timeslot = timeslot;
+        this.slotname = slotname;
+    }
 
     public int getId() {
         return id;
     }
 
-    public Info(int id, String timeslot) {
-        this.id = id;
-        this.timeslot = timeslot;
-    }
-
     public String getTimeslot() {
         return timeslot;
+    }
+
+    public String getSlotname() {
+        return slotname;
     }
 }
