@@ -5,7 +5,9 @@ package com.xmevs.dateprocess.activity;
  *  Version：2.11
  */
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.xmevs.dateprocess.R;
@@ -26,12 +29,15 @@ public class MainActivity extends AppCompatActivity {
     private Button btUpdateStartDate = null;
     private Button btUpdateEndDate = null;
     private TextView tvStartY, tvStartM, tvStartD, tvEndY, tvEndM, tvEndD, tvSlotname;
+
+    //戴输入框的
+    private AlertDialog.Builder adb;
+
     private RotatingRect rrRect = null;
 
     private int pvalue;
     private float processValue;
 
-//    private DateProcessHelp dph = new DateProcessHelp();
     private TimeslotHelp th;
 
     private long totalNumber, throughNumber;
@@ -48,34 +54,55 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        initDialog();
         OnClickListener();
         readDb();
         computingTime();
     }
 
     private void OnClickListener() {
+        tvSlotname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final EditText etDialogl = new EditText(MainActivity.this);
+                etDialogl.setText(th.getSlotname());
+                adb = new AlertDialog.Builder(MainActivity.this);
+                adb.setTitle("修改期间名")
+                        .setView(etDialogl)
+                        .setNegativeButton("取消", null);
+                adb.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        tvSlotname.setText(etDialogl.getText().toString());
+                        String slotname = tvSlotname.getText().toString();
+                        String strTemp = getTime();
+                        writeDb(strTemp, slotname);
+                        th.setDate(strTemp, slotname);
+                    }
+                });
+                adb.show();
+            }
+        });
+
         btUpdateStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new DatePickerDialog(MainActivity.this,new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        //更新控件的值; 写进数据库; 写进th; 数据处理
                         // DatePickerDialog类 参数month+1 , DatePickerDialog第3个参数-1即可
                         tvStartY.setText(year + "");
                         //这里要 +1  \ 另外这里是onDateSet() 获取来的 month 会-1 所以要+1
                         tvStartM.setText((month + 1) + "");
                         tvStartD.setText(dayOfMonth + "");
-                        tvSlotname.setText(th.getSlotname());
                         String slotname = tvSlotname.getText().toString();
                         String strTemp = getTime();
-                        writeDb(strTemp);
+                        writeDb(strTemp, slotname);
 //                        Toast.makeText(MainActivity.this, strTemp, Toast.LENGTH_SHORT).show();
-//                        dph.setStartEndDate(strTemp);
                         th.setDate(strTemp, slotname);
                         computingTime();
                     }
                     //这里要  -1
-//                }, dph.getStartY(), dph.getStartM()-1, dph.getStartD()).show();
                 }, th.getYearS(), th.getMonthS()-1, th.getDayS()).show();
             }
         });
@@ -89,15 +116,12 @@ public class MainActivity extends AppCompatActivity {
                         tvEndY.setText(year + "");
                         tvEndM.setText(( month + 1 ) + "");
                         tvEndD.setText(dayOfMonth + "");
-                        tvSlotname.setText(th.getSlotname());
                         String slotname = tvSlotname.getText().toString();
                         String strTemp = getTime();
-                        writeDb(strTemp);
-//                        dph.setStartEndDate(strTemp);
+                        writeDb(strTemp, slotname);
                         th.setDate(strTemp, slotname);
                         computingTime();
                     }
-//                }, dph.getEndY(), dph.getEndM()-1, dph.getEndD()).show();
                 }, th.getYearE(), th.getMonthE()-1, th.getDayE()).show();
             }
         });
@@ -139,9 +163,11 @@ public class MainActivity extends AppCompatActivity {
         th = new TimeslotHelp();
     }
 
+    private void initDialog() {
+
+    }
+
     private void computingTime() {
-//        totalNumber = dph.totalNumber();
-//        throughNumber = dph.throughNumber();
         totalNumber = th.totalDay();
         throughNumber = th.throughDay();
         processValue = (float) (totalNumber - throughNumber) * 100 / totalNumber;
@@ -163,30 +189,23 @@ public class MainActivity extends AppCompatActivity {
             //  手动添加一条
             Info info2 = new Info(-1, strTimeslot, slotname);
             tvSlotname.setText(slotname);
-//            dph.setStartEndDate(strTimeslot);
             th.setDate(strTimeslot, slotname);
             manager.add(info2);
         } else {
             // 读取数据 读取信息
-//            dph.setStartEndDate(info.getTimeslot());
             th.setDate(info.getTimeslot(), info.getSlotname());
             TIMESLOTID = info.getId();
             update();
         }
     }
 
-    private void writeDb(String str) {
-        String slotname =  "大二上学期23333";
+    private void writeDb(String str, String slotname) {
+//        String slotname =  "大二上学期23333";
+//        tvSlotname.setText(slotname);
         Info into = new Info(-1, getTime(), slotname);
-//        dph.setStartEndDate(str);
         th.setDate(str, slotname);
         manager.update(TIMESLOTID, into);
     }
-
-//    void defaultTime() {
-//        dph.setStartEndDate("2016,9,1-2017,1,13");
-//        update();
-//    }
 
     class ProcessBarThread implements Runnable {
 
